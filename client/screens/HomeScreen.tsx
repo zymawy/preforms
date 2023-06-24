@@ -1,5 +1,10 @@
 import * as React from "react";
-import {Dimensions, SafeAreaView, StyleSheet} from "react-native";
+import {
+	ActivityIndicator,
+	Dimensions, FlatList, Image, Platform,
+	SafeAreaView,
+	StyleSheet, Text
+} from "react-native";
 import Banner from "../components/Banner";
 import Categories from "../components/Categories";
 import Perfumes from "../components/Perfumes";
@@ -10,129 +15,177 @@ import useStateManagement from "../StateManagement/StateManagement";
 import WelcomeText from "../components/WelcomeText";
 import CarouselCards from "../components/CarouselCards";
 import Pressable from "../components/Pressable";
-import { Avatar, Button, Card, Text } from 'react-native-paper';
+import {useEffect, useState} from "react";
+import customAxios from "../axios/axios";
+import {primary} from "../constants/Colors";
+import Card from '../components/Card';
+import {FontAwesome} from "@expo/vector-icons";
+import {TabActions} from "@react-navigation/native";
+import FeaturedProductCarousel from "../components/FeaturedProductCarousel";
+const { width } = Dimensions.get('window');
+import { Text as TextOwn, View as  ViewOwn } from "../components/Themed";
+import {StatusBar} from "expo-status-bar";
 
-const LeftContent = props => <Avatar.Icon {...props} icon="folder" />
 
 export default function HomeScreen({ navigation }: RootTabScreenProps<"Home">) {
   const { state, dispatch } = useStateManagement();
+	const [brands, setBrands] = useState<{
+		data: string[];
+		error: string;
+		loading: boolean;
+		isBanner: boolean;
+	}>({ data: [], error: "", loading: false,  isBanner: false });
+	const createEntry = (entry: any) => {
+		return (
+			<Card entry={entry} />
+		)
+	}
+
+	const handleSearch = (searchText) => {
+		navigation.navigate('SearchScreen', { searchQuery: searchText });
+	};
+
+	useEffect(() => {
+		const fetchBrands = async () => {
+			try {
+				setBrands((prev) => ({ ...prev, loading: true }));
+				const res = await customAxios.get("/brands");
+				setBrands((prev) => ({
+					...prev,
+					data: res.data.data,
+					loading: false,
+				}));
+			} catch (err) {
+				setBrands((prev) => ({
+					...prev,
+					error: err?.message || 'There Has Been Some Error ',
+					loading: false,
+				}));
+			}
+		};
+
+		fetchBrands();
+	}, []);
+
+
+	const renderItem = ({ item }) =>
+		<Card entity={item}
+			  onPress={() => navigation.dispatch(
+				  TabActions.jumpTo("BrandScreen", { brandId: item.id, brandName: item.name })
+			  )}
+		/>;
 
   return (
-     <ScrollView>
-		 {/*<View style={styles.containerBase}>*/}
-			{/* <Card>*/}
-			{/*	 /!*<Card.Title title="Card Title" subtitle="Card Subtitle" left={LeftContent} />*!/*/}
-			{/*	 /!*<Card.Content>*!/*/}
-			{/*		 /!*<Text variant="titleLarge">Card title</Text>*!/*/}
-			{/*		 /!*<Text variant="bodyMedium">Card content</Text>*!/*/}
-			{/*	 /!*</Card.Content>*!/*/}
-			{/*	 <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />*/}
-			{/*	 <Card.Actions>*/}
-			{/*		 /!*<Button>Cancel</Button>*!/*/}
-			{/*		 <Button>Ok</Button>*/}
-			{/*	 </Card.Actions>*/}
-			{/* </Card>*/}
-			{/* <Card>*/}
-			{/*	 /!*<Card.Title title="Card Title" subtitle="Card Subtitle" />*!/*/}
-			{/*	 /!*<Card.Content>*!/*/}
-			{/*		 /!*<Text variant="titleLarge">Card title</Text>*!/*/}
-			{/*		 /!*<Text variant="bodyMedium">Card content</Text>*!/*/}
-			{/*	 /!*</Card.Content>*!/*/}
-			{/*	 <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />*/}
-			{/*	 <Card.Actions>*/}
-			{/*		 <Button>Cancel</Button>*/}
-			{/*		 <Button>Ok</Button>*/}
-			{/*	 </Card.Actions>*/}
-			{/* </Card>*/}
-			 {/*<WelcomeText name={state.user?.name} />*/}
-				{/*<View style={styles.container}>*/}
-				{/* /!*<WelcomeText name={state.user?.name} />*!/*/}
-				{/* /!*<View style={{ width: 50, height: 50, backgroundColor: 'powderblue', alignSelf: 'flex-end' }} />*!/*/}
-				{/* /!*<View style={{ width: 50, height: 50, backgroundColor: 'skyblue' }} />*!/*/}
-				{/* /!*<View style={{ width: 50, height: 50, backgroundColor: 'steelblue' }} />*!/*/}
-				{/* <Pressable style={styles.card}*/}
-				{/* >*/}
-				{/*	 <View style={styles.infoContainer}>*/}
-				{/*		 <Text>Welcome</Text>*/}
-				{/*	 </View>*/}
-				{/* </Pressable>*/}
-				{/* /!*<Pressable style={styles.card}*!/*/}
-				{/* /!*>*!/*/}
-				{/*	/!* <View style={styles.infoContainer}>*!/*/}
-				{/*	/!*	 <Text>Welcome</Text>*!/*/}
-				{/*	/!* </View>*!/*/}
-				{/* /!*</Pressable>*!/*/}
-				{/* /!*<Pressable style={styles.card}*!/*/}
-				{/* /!*>*!/*/}
-				{/*	/!* <View style={styles.infoContainer}>*!/*/}
-				{/*	/!*	 <Text>Welcome</Text>*!/*/}
-				{/*	/!* </View>*!/*/}
-				{/* /!*</Pressable>*!/*/}
-				{/* /!*<Pressable style={styles.card}*!/*/}
-				{/* /!*>*!/*/}
-				{/*	/!* <View style={styles.infoContainer}>*!/*/}
-				{/*	/!*	 <Text>Welcome</Text>*!/*/}
-				{/*	/!* </View>*!/*/}
-				{/* /!*</Pressable>*!/*/}
-			 {/*</View>*/}
-			  {/*<SafeAreaView style={styles.containers}>*/}
-			 	 <CarouselCards />
-			  {/*</SafeAreaView>*/}
-			  {/*<Perfumes type={'banner'}/>*/}
-			  <Categories />
-		 {/*</View>*/}
-	 </ScrollView>
+		 <ScrollView style={styles.container}>
+			 <WelcomeText name={state.user?.name} />
+			 <SerachBar onSearch={handleSearch}  />
+			 {brands.loading ? (
+				 <View style={{ marginTop: 15 }}>
+					 <ActivityIndicator size="large" color={primary} />
+				 </View>
+			 ) : brands.error.length ? (
+				 <View
+					 style={{
+						 flex: 1,
+						 alignItems: "center",
+						 marginVertical: 20,
+					 }}
+				 >
+					 <Text>{brands.error}</Text>
+				 </View>
+			 ) : (
+				 <View>
+					 <ViewOwn style={styles.textContainer}>
+						 <TextOwn style={styles.textText}>Our Brands 🚀</TextOwn>
+					 </ViewOwn>
+				 <FlatList
+					 data={brands?.data || []}
+					 renderItem={renderItem}
+					 keyExtractor={(item, index) => index.toString()}
+					 numColumns={2} // number of cards in one row
+					 columnWrapperStyle={styles.row} // applying the styles to each row
+					 style={styles.list}
+					 scrollEnabled={false}
+					 legacyImplementation={false}
+				 />
+
+					 <FlatList
+						 data={brands?.data?.reverse() || []}
+						 renderItem={renderItem}
+						 keyExtractor={(item, index) => index.toString()}
+						 numColumns={2} // number of cards in one row
+						 columnWrapperStyle={styles.row} // applying the styles to each row
+						 style={styles.list}
+						 scrollEnabled={false}
+						 legacyImplementation={false}
+					 />
+
+					 <ViewOwn style={styles.textContainer}>
+						 <TextOwn style={styles.textText}>Featured Perfume 🔥</TextOwn>
+					 </ViewOwn>
+					 <View style={styles.separator} />
+
+					 <FeaturedProductCarousel />
+				 </View>
+
+			 )}
+
+			 <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+		 </ScrollView>
   );
 }
-
-const cardGap = 16;
-
-const cardWidth = (Dimensions.get('window').width - cardGap * 3) / 2;
+// const { width } = Dimensions.get('window');
 
 
 const styles = StyleSheet.create({
-containerBase: {
-	padding: 10,
-	// width:'100%',
-	display:'flex', flexDirection:'row', justifyContent:'space-between'
-  },
-  container: {
-	  flexDirection: 'row',
-	  flexWrap: 'wrap',
-	  justifyContent: 'center',
-    // flex: 1,
-    // display: 'flex',
-    // paddingTop: 10,
-	//   alignItems: "center",
-	  // flexDirection: 'row',
-    // paddingHorizontal: 12,
-
-  },
-	card: {
-		marginTop: cardGap,
-		// marginLeft: 1 % 2 !== 0 ? cardGap : 0,
-		width: cardWidth,
-		height: 180,
-		backgroundColor: 'white',
-		borderRadius: 16,
-		shadowOpacity: 0.2,
-		justifyContent: 'center',
-		alignItems: 'center',
-		// backgroundColor: 'white',
-		// borderRadius: 16,
-		// shadowOpacity: 0.3,
-		// shadowRadius: 4,
-		// shadowColor: 'black',
-		// shadowOffset: {
-		// 	height: 0,
-		// 	width: 0,
-		// },
-		// elevation: 1,
-		// marginVertical: 20,
-		// flexDirection: "row",
-
+	container: {
+		flex: 1,
+		paddingHorizontal: 1,
 	},
-	infoContainer: {
-		padding: 20,
-	}
+	row: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		marginTop: 10,
+	},
+	titleContainer: {
+		backgroundColor: '#f9f9f9',
+		paddingVertical: 10,
+		paddingHorizontal: 15,
+		borderRadius: 10,
+		marginVertical: 20,
+		alignItems: 'center',
+		justifyContent: 'center',
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5,
+	},
+	title: {
+		fontSize: 24,
+		fontWeight: 'bold',
+		color: '#333',
+	},
+	list: {
+		flex: 1
+	},
+	icon: {
+		marginRight: 10, // add some margin to the right of the icon
+	},
+	textContainer: {
+		marginTop: 5,
+		marginBottom: 5,
+		marginLeft: 5
+	},
+	textText: {
+		fontSize: 15,
+	},
+	separator: {
+		borderBottomColor: '#ccc',
+		borderBottomWidth: 1,
+		marginHorizontal: 10,
+	},
 });

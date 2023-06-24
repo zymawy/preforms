@@ -9,7 +9,7 @@ export default function Pressable(props: DefautlPressableProps) {
   return (
     <DefaultPressable
       style={({ pressed }) => ({
-        opacity: pressed ? 0.8 : 1,
+        opacity: pressed ? 0.2 : 1,
       })}
 	  {...props}
     />

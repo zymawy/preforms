@@ -1,41 +1,38 @@
-import { StatusBar } from 'expo-status-bar';
-import * as React from 'react';
-import {Platform, ScrollView, StyleSheet} from 'react-native';
-import { FlatList } from 'react-native';
-import { Text, View } from '../components/Themed';
-import {RootStackScreenProps} from "../types";
-import useCartManagement from "../StateManagement/CartManagement";
-import capitalizeString, { strLimit } from "../helpers/capitalize";
-import { Button } from 'react-native-paper';
+import React from 'react';
+import {
+	Text,
+	FlatList,
+	StyleSheet,
+	Image,
+	TouchableOpacity, Alert
+} from 'react-native';
+import Button from "../components/Button";
+// Importing a custom button component
+
+import {View, ScrollView} from "../components/Themed";
 import customAxios from "../axios/axios";
 import Actions from "../StateManagement/Actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useCartManagement from "../StateManagement/CartManagement";
+const CART_ITEMS = [
+	{ id: '1', name: 'Perfume A', price: 50, quantity: 2, thumbnailUrl: 'https://cdn.salla.sa/yrlRO/x1x5qjVc0pAqpPMSvMWjsPbgk7CksGIzLAKl7qqV.jpg'},
+	{ id: '2', name: 'Perfume B', price: 80, quantity: 1, thumbnailUrl: 'https://cdn.salla.sa/yrlRO/x1x5qjVc0pAqpPMSvMWjsPbgk7CksGIzLAKl7qqV.jpg'},
+	{ id: '3', name: 'Perfume C', price: 120, quantity: 3, thumbnailUrl: 'https://cdn.salla.sa/yrlRO/x1x5qjVc0pAqpPMSvMWjsPbgk7CksGIzLAKl7qqV.jpg' },
+];
 
-export default function CartScreen({
-									   navigation,
-									   route
-								   }: RootStackScreenProps<"CartScreen">) {
-
+const ShoppingCartScreen = () => {
 	const { state, dispatch } = useCartManagement();
-	function Totals() {
+	const calculateTotal = () => {
+		let total = 0;
 		console.log(state.cartItems)
-		return (
-			<View style={styles.cartLineTotal}>
-				<Text style={[styles.lineLeft, styles.lineTotal]}>Total</Text>
-				<Text style={styles.lineRight}>$ {state.totalPrice}</Text>
-			</View>
-		);
-	}
-	function renderItem({item: item}) {
-		return (
-			<View style={styles.cartLine}>
-				<Text style={styles.lineLeft}>
-					{strLimit(item.name)} x {item.qty}</Text>
-				<Text style={styles.lineRight}>$ {item.totalPrice}</Text>
-			</View>
-		);
+		state.cartItems.forEach(item => total += item.totalPrice);
+		return total;
 	}
 
+	const handleCheckout = () => {
+		// Implement checkout functionality here
+		console.log('Proceeding to Checkout');
+	}
 
 	async function completeOrder  () {
 
@@ -64,74 +61,123 @@ export default function CartScreen({
 			await  AsyncStorage.removeItem('@cart')
 		}
 
-		alert('Complete Order')
+		Alert.alert(
+			"Success",
+			`Wow, order placed with #${res.data.id} 🎉`,
+			[
+				{ text: "OK" }
+			]
+		);
 	}
-	return (
-		<View>
-		<FlatList
-			style={styles.itemsList}
-			contentContainerStyle={styles.itemsListContainer}
-			data={state.cartItems}
-			renderItem={renderItem}
-			keyExtractor={(item) => item.id.toString()}
-			ListFooterComponent={Totals}
-		/>
-			<Button icon="cart-arrow-down" mode="contained" onPress={completeOrder}>
-				Complete Order
-			</Button>
+	const renderItem = ({ item }) => (
+		<View style={styles.itemContainer}>
+			<Text style={styles.itemName}>{item.name}</Text>
+			<Text style={styles.itemDetails}>Quantity: {item.qty}</Text>
+			<Text style={styles.itemDetails}>Price: ${item.totalPrice}</Text>
+			<Text style={styles.itemDetails}>Subtotal: ${item.totalPrice}</Text>
 		</View>
 	);
-}
+
+	function renderTotals() {
+		return (
+			<View style={styles.itemContainer}>
+				<Text style={styles.totalText}></Text>
+				<Text style={styles.totalText}></Text>
+				<Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
+			</View>
+		);
+	}
+
+
+	return (
+		<View style={styles.container}>
+			<FlatList
+				data={state.cartItems}
+				keyExtractor={(item) => item.id.toString()}
+				renderItem={({ item }) => (
+					<View style={styles.itemContainer}>
+						<Image style={styles.thumbnail} source={{ uri: item.image }} />
+						<Text style={styles.itemText}>{item.name} x {item.qty}</Text>
+						<Text style={styles.itemText}>${item.totalPrice}</Text>
+						<TouchableOpacity style={styles.removeItemButton} onPress={() => removeItem(item.id)}>
+							<Text style={styles.buttonText}>Remove</Text>
+						</TouchableOpacity>
+					</View>
+				)}
+				ListFooterComponent={renderTotals}
+			/>
+			<View style={styles.totalContainer}>
+				<Button style={styles.checkoutButton} text="Proceed to Checkout" onPress={completeOrder}  disabled={false}/>
+			</View>
+		</View>
+	);
+};
 
 const styles = StyleSheet.create({
-	card: {
-		backgroundColor: 'white',
-		borderRadius: 16,
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		shadowColor: 'black',
-		shadowOffset: {
-			height: 0,
-			width: 0,
-		},
-		elevation: 1,
-		marginVertical: 20,
-	},
 	container: {
 		flex: 1,
-		paddingTop: 10,
-		paddingHorizontal: 12,
+		padding: 10,
 	},
-	cartLine: {
+	itemContainer: {
+		padding: 10,
+		backgroundColor: '#f8f8f8',
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 1 },
+		shadowOpacity: 0.3,
+		shadowRadius: 1,
+		elevation: 3,
 		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		borderWidth: 1,
+		borderColor: 'lightgray',
+		marginBottom: 10,
+		borderRadius: 5,
 	},
-	cartLineTotal: {
-		flexDirection: 'row',
-		borderTopColor: '#dddddd',
-		borderTopWidth: 1
+	thumbnail: {
+		width: 50,
+		height: 50,
+		marginRight: 10,
 	},
-	lineTotal: {
+	//
+	itemName: {
+		fontSize: 18,
 		fontWeight: 'bold',
 	},
-	lineLeft: {
-		fontSize: 20,
-		lineHeight: 40,
-		color:'#333333'
+	itemDetails: {
+		fontSize: 16,
 	},
-	lineRight: {
-		flex: 1,
+	total: {
+		fontSize: 24,
+		fontWeight: 'bold',
+		textAlign: 'right',
+		marginBottom: 20,
+		backgroundColor: '#f8f8f8',
+	},
+	checkoutButton: {
+		backgroundColor: '#ff6347',
+		color: '#fff',
+	},
+	itemText: {
+		fontSize: 16,
+		backgroundColor: '#f8f8f8',
+	},
+	totalContainer: {
+		marginTop: 20,
+	},
+	totalText: {
 		fontSize: 20,
 		fontWeight: 'bold',
-		lineHeight: 40,
-		color:'#333333',
-		textAlign:'right',
 	},
-	itemsList: {
-		backgroundColor: '#eeeeee',
+	removeItemButton: {
+		backgroundColor: 'red',
+		padding: 10,
+		borderRadius: 5,
 	},
-	itemsListContainer: {
-		backgroundColor: '#eeeeee',
-		paddingVertical: 8,
-		marginHorizontal: 8,
+	buttonText: {
+		color: 'white',
+		fontWeight: 'bold',
 	},
 });
+
+export default ShoppingCartScreen;

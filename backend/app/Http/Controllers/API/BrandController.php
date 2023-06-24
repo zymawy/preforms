@@ -4,18 +4,24 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\StoreBrandRequest;
 use App\Http\Requests\UpdateBrandRequest;
+use App\Http\Resources\BrandResource;
+use App\Http\Resources\PerfumeResource;
 use App\Models\Brand;
 
-class BrandController extends Controller
+class BrandController extends BaseController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
+        $brands = Brand::query()
+            ->limit(4)
+            ->get();
+
+        return $this->sendResponse(BrandResource::collection($brands), 'Brands fetched.');
     }
 
     /**

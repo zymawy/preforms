@@ -17,7 +17,16 @@ class PerfumeController extends BaseController
      */
     public function index(Request $request)
     {
-        $perfumes = Perfume::query()->has('categories')->with('categories')->inRandomOrder()->limit($request->get('limited', 1000))->get();
+        $perfumes = Perfume::query()
+            ->has('categories')
+            ->with('categories')
+            ->when($request->get('brand'), function (\Illuminate\Database\Eloquent\Builder $q, $brand) {
+                $q->whereHas('brand', function (\Illuminate\Database\Eloquent\Builder  $q1) use ($brand) {
+                    $q1->where('brands.id',$brand);
+                })->with('brand');
+            })
+            ->inRandomOrder()->limit($request->get('limited', 1000))
+            ->get();
         return $this->sendResponse(PerfumeResource::collection($perfumes), 'Perfumes fetched.');
     }
 

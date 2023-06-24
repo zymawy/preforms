@@ -15,4 +15,9 @@ class Perfume extends Model
         return $this->belongsToMany(Category::class, 'perfume_categories', 'perfume_id', 'category_id')
             ->using(PerfumeCategory::class);
     }
+
+    public function brand() {
+
+        return $this->belongsTo(Brand::class);
+    }
 }

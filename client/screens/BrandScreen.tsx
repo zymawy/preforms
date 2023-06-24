@@ -1,30 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
 import {
-	DeviceEventEmitter,
-	Dimensions, FlatList,
+	ActivityIndicator, DeviceEventEmitter, Dimensions,
 	Platform,
 	ScrollView,
 	StyleSheet
 } from 'react-native';
-
-import EditScreenInfo from '../components/EditScreenInfo';
+import { FlatList } from 'react-native';
 import { Text, View } from '../components/Themed';
-import {RootStackScreenProps} from "../types";
-import Perfumes from "../components/Perfumes";
-import CardPerfume from "../components/CardPerfume";
-import {TabActions} from "@react-navigation/native";
-import {useEffect, useState} from "react";
+import {RootStackScreenProps, RootTabScreenProps} from "../types";
+import useCartManagement from "../StateManagement/CartManagement";
 import customAxios from "../axios/axios";
-import {storeData} from "../StateManagement/CartManagement";
-import {FontAwesome} from "@expo/vector-icons";
+import Actions from "../StateManagement/Actions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {FontAwesome, FontAwesome5} from "@expo/vector-icons";
+import {useEffect, useState} from "react";
+import {TabActions} from "@react-navigation/native";
+import CardPerfume from "../components/CardPerfume";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+import { storeData } from '../StateManagement/CartManagement';
 
+export default function BrandScreen({ route, navigation }: RootTabScreenProps<"BrandScreen">) {
 
-export default function PerfumesScreen({
-										   navigation,
-										   route
-								   }: RootStackScreenProps<"PerfumesScreen">) {
-
+	const { state, dispatch } = useCartManagement();
+	const { brandId, brandName} = route.params;
+	console.log(brandId)
 	const [perfumes, setPerfumes] = useState<{
 		data: string[];
 		error: string;
@@ -32,6 +33,34 @@ export default function PerfumesScreen({
 		isBanner: boolean;
 	}>({ data: [], error: "", loading: false,  isBanner: false });
 
+	const fetchPerfumes = async () => {
+		try {
+			setPerfumes((prev) => ({ ...prev, loading: true }));
+			const res = await customAxios.get(`/perfumes?brand=${brandId}`);
+			console.log(res.data)
+			setPerfumes((prev) => ({
+				...prev,
+				data: res.data.data,
+				loading: false,
+			}));
+		} catch (err) {
+			setPerfumes((prev) => ({
+				...prev,
+				error: err?.message || 'There Has Been Some Error ',
+				loading: false,
+			}));
+		}
+	};
+
+	useEffect(() => {
+		fetchPerfumes();
+	}, []);
+
+	useFocusEffect(
+		useCallback(() => {
+			fetchPerfumes(); // Refetch products when the screen comes into focus
+		}, [brandId]) // Refetch whenever brandId changes
+	);
 
 	const { width } = Dimensions.get('window');
 	const cardWidth = width / 2 - 20; // screen width divided by 2 minus margin
@@ -43,29 +72,6 @@ export default function PerfumesScreen({
 				console.warn('Store Done')
 			});
 	}
-
-
-	useEffect(() => {
-		const fetchPerfumes = async () => {
-			try {
-				setPerfumes((prev) => ({ ...prev, loading: true }));
-				const res = await customAxios.get("/perfumes");
-				setPerfumes((prev) => ({
-					...prev,
-					data: res.data.data,
-					loading: false,
-				}));
-			} catch (err) {
-				setPerfumes((prev) => ({
-					...prev,
-					error: err?.message || 'There Has Been Some Error ',
-					loading: false,
-				}));
-			}
-		};
-
-		fetchPerfumes();
-	}, []);
 
 	const  renderPerfume = ({item: perfume, index: index}) =>  {
 		return (
@@ -80,11 +86,16 @@ export default function PerfumesScreen({
 		)
 	}
 
+	const getPerfumes = () => {
+
+		return perfumes.data
+	}
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.titleContainer}>
 				<FontAwesome name="building" size={24} color="#333" style={styles.icon} />
-				<Text style={styles.title}>All Perfumes</Text>
+				<Text style={styles.title}>{brandName}</Text>
 			</View>
 			<FlatList
 				legacyImplementation={true}

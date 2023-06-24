@@ -49,6 +49,8 @@ class CartController extends BaseController
 
             $order = Order::query()->create([
                 'customer_id' => auth()->id(),
+                'cart_id' => 1,
+                'total' => 0
             ]);
 
 

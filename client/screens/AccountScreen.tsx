@@ -1,6 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import {ImageBackground, Platform, StyleSheet} from 'react-native';
+import {
+	Image,
+	ImageBackground,
+	Platform,
+	StyleSheet,
+	TextInput
+} from 'react-native';
 
 import { Text, View } from '../components/Themed';
 import {RootStackScreenProps} from "../types";
@@ -12,6 +18,8 @@ import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Actions from "../StateManagement/Actions";
 import useCartManagement from "../StateManagement/CartManagement";
+import {useState} from "react";
+import {TabActions} from "@react-navigation/native";
 
 
 
@@ -22,7 +30,15 @@ export default function AccountScreen({
 
 	const { state, dispatch } = useStateManagement();
 	const { dispatch: cartDispatch } = useCartManagement();
+	const [user, setUser] = useState(state.user);
 
+	const [isEditing, setIsEditing] = useState(false);
+	const handleChange = (field, value) => {
+		setUser({
+			...user,
+			[field]: value,
+		});
+	};
 	const logout = async () => {
 				try {
 					await AsyncStorage.clear();
@@ -60,13 +76,14 @@ export default function AccountScreen({
 			</View>
 			<MonoText>{state.user?.name}</MonoText>
 			<View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-			<View style={{flexDirection:"row", justifyContent: 'center'}}>
-				<View>
-					{/*<Button text="Login" onPress={() => (console.log('sdfd'))} disabled={false} />*/}
-				</View>
-				<View>
-					<Button text="Logout" onPress={logout} disabled={false} />
-				</View>
+			<View style={styles.buttonGroup}>
+				<Button text="Edit"  disabled={false} onPress={() => setIsEditing(true)} />
+				<Button text="Orders" disabled={false} onPress={() =>
+					navigation.dispatch(
+						TabActions.jumpTo("OrderScreen")
+					)
+				} />
+				<Button text="Logout" onPress={logout} disabled={false} />
 			</View>
 		</View>
 	);
@@ -99,5 +116,27 @@ const styles = StyleSheet.create({
 	image: {
 		width: "100%",
 		height: "100%",
+	},
+	thumbnail: {
+		width: 100,
+		height: 100,
+		marginBottom: 20,
+	},
+	info: {
+		fontSize: 20,
+		margin: 10,
+	},
+	input: {
+		height: 40,
+		borderColor: 'gray',
+		borderWidth: 1,
+		width: '100%',
+		marginBottom: 10,
+		paddingLeft: 8,
+	},
+	buttonGroup: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '80%',
 	},
 });

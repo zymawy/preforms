@@ -11,6 +11,7 @@ import {
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import PerfumesScreen from "./screens/PerfumesScreen";
+import BrandScreen from "./screens/BrandScreen";
 
 declare global {
   namespace ReactNavigation {
@@ -26,8 +27,11 @@ export type RootStackParamList = {
   PerfumeDetail: undefined;
   PerfumesScreen: undefined;
   Register: undefined;
-	AccountScreen: undefined;
-	CartScreen: undefined;
+  AccountScreen: undefined;
+  CartScreen: undefined;
+	OrderScreen: undefined;
+  BrandScreen:{brand: object};
+  SearchScreen:{brand: object};
 };
 
 export type RootTabParamList = {
@@ -39,7 +43,10 @@ export type RootTabParamList = {
   PerfumeDetail: undefined;
   PerfumesScreen: undefined;
   AccountScreen: undefined;
-  CartScreen: undefined;
+CartScreen: undefined;
+	OrderScreen: undefined;
+  BrandScreen:{brand: object};
+	SearchScreen:undefined
 };
 
 export type RootDrawerParamList = {

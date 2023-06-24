@@ -34,6 +34,7 @@ class PerfumeFactory extends Factory
             'price' => $this->faker->numberBetween(1, 999),
             'quantity' => $this->faker->numberBetween(1, 999),
             'image' => $this->faker->randomElement($values),
+
         ];
     }
 }

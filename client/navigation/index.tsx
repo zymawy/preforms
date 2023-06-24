@@ -1,10 +1,10 @@
 import { AntDesign, Entypo, Feather } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
-  NavigationContainer,
-  DefaultTheme,
-  DarkTheme,
-  DrawerActions,
+	NavigationContainer,
+	DefaultTheme,
+	DarkTheme,
+	DrawerActions, getFocusedRouteNameFromRoute,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -38,6 +38,9 @@ import isAuthenticated from "../hooks/useAuthenticated";
 import * as SecureStore from "expo-secure-store";
 import SplashScreen from "../screens/SplashScreen";
 import PerfumesScreen from "../screens/PerfumesScreen";
+import BrandScreen from "../screens/BrandScreen";
+import OrderScreen from "../screens/OrderScreen";
+import SearchScreen from "../screens/SearchScreen";
 
 export default function Navigation({
   colorScheme,
@@ -47,6 +50,7 @@ export default function Navigation({
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
+      // theme={DefaultTheme}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
       <RootNavigator />
@@ -108,15 +112,15 @@ function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
       initialRouteName="Home"
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarActiveTintColor: primary,
         tabBarInactiveTintColor: secondary,
-        tabBarStyle: { ...styles.tabBar, ...styles.shadow },
+        // tabBarStyle: { ...styles.tabBar, ...styles.shadow },
         headerStyle: {
           elevation: 0,
         },
         tabBarShowLabel: false,
-      }}
+	  })}
     >
       <BottomTab.Screen
         name="Home"
@@ -170,52 +174,79 @@ function BottomTabNavigator() {
           ),
         })}
       />
+		<BottomTab.Screen
+			name="SearchScreen"
+			component={SearchScreen}
+			options={({ navigation }: RootTabScreenProps<"SearchScreen">) => ({
+				headerTitleStyle: { fontFamily: "space-mono", fontWeight: "700" },
+				headerTitleAlign: "center",
+				tabBarIcon: ({ color }) => (
+					<Feather
+						name="package"
+						size={26}
+						color={color}
+						style={{ marginBottom: 10 }}
+					/>
+				),
+				headerLeft: () => (
+					<Pressable
+						onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+					>
+						<CartCount />
+					</Pressable>
+				),
+				headerRight: () => (
+					<Pressable onPress={() => navigation.navigate("Modal")}>
+						<Profile />
+					</Pressable>
+				),
+				tabBarButton: () => null,
+			})}
+		/>
+
+		<BottomTab.Screen
+			name="OrderScreen"
+			component={OrderScreen}
+			options={({ navigation }: RootTabScreenProps<"OrderScreen">) => ({
+				headerTitleStyle: { fontFamily: "space-mono", fontWeight: "700" },
+				headerTitleAlign: "center",
+				tabBarIcon: ({ color }) => (
+					<Feather
+						name="package"
+						size={26}
+						color={color}
+						style={{ marginBottom: 10 }}
+					/>
+				),
+				headerLeft: () => (
+					<Pressable
+						onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+					>
+						<CartCount />
+					</Pressable>
+				),
+				headerRight: () => (
+					<Pressable onPress={() => navigation.navigate("Modal")}>
+						<Profile />
+					</Pressable>
+				),
+				tabBarButton: () => null,
+			})}
+		/>
       <BottomTab.Screen
         name="PerfumeDetail"
         component={PerfumeScreen}
-        options={({ navigation,  }: RootTabScreenProps<"PerfumeDetail">) => ({
-			title: "Perfume Detail",
-          headerTitleStyle: { fontFamily: "space-mono", fontWeight: "700" },
-          headerTitleAlign: "center",
-          // tabBarIcon: () => (
-          //   <Entypo
-          //     name="plus"
-          //     size={40}
-          //     color={"#"}
-          //     style={{ marginBottom: -3 }}
-          //   />
-          // ),
-          // tabBarButton: (props) => (
-          //   <TouchableOpacity
-          //     {...props}
-          //     style={{
-          //       top: -20,
-          //       justifyContent: "center",
-          //       alignItems: "center",
-          //       ...styles.shadow,
-          //     }}
-          //     activeOpacity={0.7}
-          //     onPress={() => {}}
-          //   >
-          //     <View style={[styles.addBtn, { backgroundColor: primary }]}>
-          //       {props.children}
-          //     </View>
-          //   </TouchableOpacity>
-          // ),
-          headerLeft: () => (
-            <Pressable
-              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-            >
-              <CartCount />
-            </Pressable>
-          ),
-          headerRight: () => (
-            <Pressable onPress={() => navigation.navigate("Modal")}>
-              <Profile />
-            </Pressable>
-          ),
-        })}
+		options={{
+			tabBarButton: () => null,
+		}}
       />
+		<BottomTab.Screen
+			name="BrandScreen"
+			component={BrandScreen}
+			options={{
+				tabBarButton: () => null,
+			}}
+		/>
       <BottomTab.Screen
         name="PerfumesScreen"
         component={PerfumesScreen}

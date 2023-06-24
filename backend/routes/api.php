@@ -32,5 +32,7 @@ Route::prefix('v1')->group(function(){
         Route::resource('perfumes', \App\Http\Controllers\API\PerfumeController::class);
         Route::resource('brands', \App\Http\Controllers\API\BrandController::class);
         Route::resource('carts', \App\Http\Controllers\API\CartController::class);
+        Route::get('search', \App\Http\Controllers\API\SearchController::class);
+        Route::resource('orders', \App\Http\Controllers\API\OrderController::class);
     });
 });

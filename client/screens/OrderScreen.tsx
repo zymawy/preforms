@@ -1,137 +1,154 @@
-import { StatusBar } from 'expo-status-bar';
-import * as React from 'react';
-import {Platform, ScrollView, StyleSheet} from 'react-native';
-import { FlatList } from 'react-native';
-import { Text, View } from '../components/Themed';
+import React, {useEffect, useState} from 'react';
+import { FlatList, Modal, Button, TouchableOpacity, StyleSheet } from 'react-native';
 import {RootStackScreenProps} from "../types";
-import useCartManagement from "../StateManagement/CartManagement";
-import capitalizeString, { strLimit } from "../helpers/capitalize";
-import { Button } from 'react-native-paper';
+import { Text, View } from '../components/Themed';
 import customAxios from "../axios/axios";
-import Actions from "../StateManagement/Actions";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const orders = [
+	// These are dummy orders
+	{ id: '1', date: '2023-07-10', total: '100.00', status: 'Delivered' },
+	{ id: '2', date: '2023-06-22', total: '200.00', status: 'Shipping' },
+	// more orders...
+];
 
 export default function OrderScreen({
-									   navigation,
-									   route
-								   }: RootStackScreenProps<"CartScreen">) {
+										  navigation,
+										  route
+									  }: RootStackScreenProps<"OrderScreen">) {
+	const [modalVisible, setModalVisible] = useState(false);
+	const [selectedOrder, setSelectedOrder] = useState(null);
+	const [orders, setOrders] = useState<{
+		data: string[];
+		error: string;
+		loading: boolean;
+		isBanner: boolean;
+	}>({ data: [], error: "", loading: false,  isBanner: false });
+	useEffect(() => {
+		const fetchPerfumes = async () => {
+			try {
+				setOrders((prev) => ({ ...prev, loading: true }));
+				const res = await customAxios.get("/orders");
+				setOrders((prev) => ({
+					...prev,
+					data: res.data.data,
+					loading: false,
+				}));
+			} catch (err) {
 
-	const { state, dispatch } = useCartManagement();
-	function Totals() {
-		console.log(state.cartItems)
-		return (
-			<View style={styles.cartLineTotal}>
-				<Text style={[styles.lineLeft, styles.lineTotal]}>Total</Text>
-				<Text style={styles.lineRight}>$ {state.totalPrice}</Text>
-			</View>
-		);
-	}
-	function renderItem({item: item}) {
-		return (
-			<View style={styles.cartLine}>
-				<Text style={styles.lineLeft}>
-					{strLimit(item.name)} x {item.qty}</Text>
-				<Text style={styles.lineRight}>$ {item.totalPrice}</Text>
-			</View>
-		);
-	}
+				setOrders((prev) => ({
+					...prev,
+					error:'There Has Been Some Error ',
+					loading: false,
+				}));
+			}
+		};
 
+		fetchPerfumes();
+	}, []);
 
-	async function completeOrder  () {
+	const handlePress = (order) => {
+		setSelectedOrder(order);
+		setModalVisible(true);
+	};
 
+	const handleClose = () => {
+		setModalVisible(false);
+		setSelectedOrder(null);
+	};
 
-		console.log({
-			cart_items_ids: state.cartItems
-		})
-		const res =  await customAxios.post('/carts', {
-			cart_items_ids: state.cartItems.map((item: object) => {
-				return {'id': item.id, 'qty': item.qty}
-			})
-		})
-
-		if (res.data) {
-			dispatch(
-				Actions.setTotalCartItems(0)
-			)
-			dispatch(
-				Actions.setCartItems([])
-			)
-			dispatch(
-				Actions.setTotalPrice(0)
-			)
-
-			await AsyncStorage.clear();
-			await  AsyncStorage.removeItem('@cart')
-		}
-
-		alert('Complete Order')
-	}
-	return (
-		<View>
-		<FlatList
-			style={styles.itemsList}
-			contentContainerStyle={styles.itemsListContainer}
-			data={state.cartItems}
-			renderItem={renderItem}
-			keyExtractor={(item) => item.id.toString()}
-			ListFooterComponent={Totals}
-		/>
-			<Button icon="cart-arrow-down" mode="contained" onPress={completeOrder}>
-				Complete Order
-			</Button>
+	const renderItem = ({ item }) => (
+		<View style={styles.card}>
+			<Text style={styles.title}>Order ID: {item.id}</Text>
+			<View style={styles.divider} />
+			<Text style={styles.text}>Date: {item.created_at}</Text>
+			<Text style={styles.text}>Total: ${item.total}</Text>
+			<Text style={styles.text}>Status: {item.status || 'Delivered'}</Text>
+			<TouchableOpacity style={styles.button} onPress={() => handlePress(item)}>
+				<Text style={styles.buttonText}>View Details</Text>
+			</TouchableOpacity>
 		</View>
 	);
-}
+
+
+	return (
+		<View style={styles.container}>
+			<FlatList
+				data={orders.data}
+				renderItem={renderItem}
+				keyExtractor={item => item.id}
+			/>
+
+			{selectedOrder && (
+				<Modal
+					animationType="slide"
+					transparent={false}
+					visible={modalVisible}
+				>
+					<View style={styles.modalContainer}>
+						<Text style={styles.title}>Order Details</Text>
+						<Text>Order ID: {selectedOrder.id}</Text>
+						<Text>Date: {selectedOrder.created_at}</Text>
+						<Text>Total: ${selectedOrder.total}</Text>
+						<Text>Status: {selectedOrder.status || 'Delivered'}</Text>
+						<TouchableOpacity style={styles.button} onPress={handleClose}>
+							<Text style={styles.buttonText}>Close</Text>
+						</TouchableOpacity>
+					</View>
+				</Modal>
+			)}
+		</View>
+	);
+};
 
 const styles = StyleSheet.create({
-	card: {
-		backgroundColor: 'white',
-		borderRadius: 16,
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		shadowColor: 'black',
-		shadowOffset: {
-			height: 0,
-			width: 0,
-		},
-		elevation: 1,
-		marginVertical: 20,
-	},
 	container: {
 		flex: 1,
-		paddingTop: 10,
-		paddingHorizontal: 12,
+		padding: 10,
 	},
-	cartLine: {
-		flexDirection: 'row',
+	card: {
+		borderWidth: 1,
+		borderColor: '#ddd',
+		borderRadius: 10,
+		padding: 10,
+		marginBottom: 10,
+		backgroundColor: '#fff',
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 1,
+		},
+		shadowOpacity: 0.20,
+		shadowRadius: 1.41,
+		elevation: 2,
+		color: '#000',
 	},
-	cartLineTotal: {
-		flexDirection: 'row',
-		borderTopColor: '#dddddd',
-		borderTopWidth: 1
-	},
-	lineTotal: {
+	title: {
+		fontSize: 18,
 		fontWeight: 'bold',
+		color: '#000',
 	},
-	lineLeft: {
-		fontSize: 20,
-		lineHeight: 40,
-		color:'#333333'
+	divider: {
+		height: 1,
+		backgroundColor: '#ddd',
+		marginVertical: 10,
 	},
-	lineRight: {
+	text: {
+		marginBottom: 10,
+		color: '#000',
+	},
+	button: {
+		backgroundColor: '#3498db',
+		padding: 10,
+		borderRadius: 5,
+	},
+	buttonText: {
+		color: '#fff',
+		textAlign: 'center',
+	},
+	modalContainer: {
 		flex: 1,
-		fontSize: 20,
-		fontWeight: 'bold',
-		lineHeight: 40,
-		color:'#333333',
-		textAlign:'right',
-	},
-	itemsList: {
-		backgroundColor: '#eeeeee',
-	},
-	itemsListContainer: {
-		backgroundColor: '#eeeeee',
-		paddingVertical: 8,
-		marginHorizontal: 8,
+		padding: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 });

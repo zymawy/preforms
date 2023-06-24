@@ -7,15 +7,7 @@ import useColorScheme from "../hooks/useColorScheme";
 import Pressable from "./Pressable";
 import { Text, View } from "./Themed";
 
-export default function Category({
-  name,
-  icon,
-  image,
-}: {
-  name: string;
-	image: string;
-  icon: React.ComponentProps<typeof FontAwesome5>["name"];
-}) {
+export default function Category({name, icon, image,} : { name: string; image: string; icon: React.ComponentProps<typeof FontAwesome5>["name"];}) {
   const colorScheme = useColorScheme() == "dark" ? "light" : "dark";
 
   return (

@@ -4,18 +4,22 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 
-class OrderController extends Controller
+class OrderController extends BaseController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        //
+        $orders = Order::query()->where('customer_id', auth()->id())
+            ->get();
+
+        return $this->sendResponse(OrderResource::collection($orders), 'Orders fetched.');
     }
 
     /**

@@ -20,6 +20,7 @@ class CreatePerfumesTable extends Migration
             $table->text('description')->nullable();
             $table->double('price');
             $table->integer('quantity');
+            $table->unsignedBigInteger('brand_id')->nullable();
             $table->timestamps();
         });
     }

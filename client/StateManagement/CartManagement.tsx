@@ -15,7 +15,7 @@ export async function getCartItems() {
 	try {
 		let cartItems = await AsyncStorage.getItem('@cart');
 		cartItems = cartItems ? JSON.parse(cartItems) : [];
-		console.warn('Cart Loaded!', cartItems?.length)
+		// console.warn('Cart Loaded!', cartItems?.length)
 		return cartItems;
 	} catch (e) {
 		console.warn(e)
@@ -37,7 +37,8 @@ export async function storeData(perfume: any) {
 					id: perfume.id,
 					qty: 1,
 					name: perfume.name,
-					totalPrice: perfume.price
+					totalPrice: perfume.price,
+					image: perfume.image
 				}];
 			} else {
 				toBeSaved = perfumes.map((item: object) => {
@@ -50,7 +51,8 @@ export async function storeData(perfume: any) {
 						id: item.id,
 						qty: item.qty,
 						name: item.name,
-						totalPrice: item.totalPrice
+						totalPrice: item.totalPrice,
+						image: perfume.image
 					};
 				})
 				toBeSaved =	toBeSaved.filter((value: any, index: any, self: any) =>

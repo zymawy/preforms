@@ -14,6 +14,6 @@ class BrandResource extends \Illuminate\Http\Resources\Json\JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return array_merge(['image' => 'https://cdn.salla.sa/yrlRO/6t4BpzuUGVWFiZiud4FzIr1HFuxeoXMFh9PcefKC.jpg'],parent::toArray($request));
     }
 }

@@ -1,27 +1,46 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
 	Text,
 	Image,
-	View,
-	ScrollView,
 	SafeAreaView,
 	StyleSheet,
-	DeviceEventEmitter
+	DeviceEventEmitter,
+	Dimensions, Animated,TouchableOpacity
 } from 'react-native';
 import {RootStackScreenProps} from "../types";
-import { Button } from 'react-native-paper';
 import { storeData } from '../StateManagement/CartManagement';
-// import { getProducts } from '../services/ProductsService.js';
+import {View, ScrollView} from "../components/Themed";
+import {FontAwesome} from "@expo/vector-icons";
+import Carousel, { Pagination } from 'react-native-snap-carousel';
+import CardPerfume from "../components/CardPerfume";
+import {TabActions} from "@react-navigation/native"; // install this using npm i react-native-snap-carousel
+
+const { width } = Dimensions.get('window');
 
 export default function PerfumeScreen({
 	navigation,
    route
   }: RootStackScreenProps<"PerfumeDetail">) {
 
-	// DeviceEventEmitter.removeListener("event.test");
-
 	// @ts-ignore
 	const { perfume = null } = route?.params;
+
+	const carouselRef = useRef(null);
+	const scrollY = new Animated.Value(0);
+	const [activeSlide, setActiveSlide] = React.useState(0);
+
+	const handleScroll = Animated.event(
+		[{ nativeEvent: { contentOffset: { y: scrollY } } }],
+		{ useNativeDriver: true },
+	);
+
+	const renderItem = ({ item }) => {
+		return (
+			<Image source={{ uri: item }} style={styles.carouselImage} />
+		);
+	};
+
+
 	const onAddToCart = async  () => {
 		storeData(perfume)
 			.then(async r => {
@@ -30,70 +49,98 @@ export default function PerfumeScreen({
 		});
 	}
 
-  return (
-	  (perfume ?
-		  <SafeAreaView>
-			  <ScrollView>
-				  <Image
-					  style={styles.image}
-					  source={{uri: perfume.image}}
-				  />
-				  <View style={styles.infoContainer}>
-					  <Text style={styles.name}>{perfume.name}</Text>
-					  <Text style={styles.price}>$ {perfume.price}</Text>
-					  <Text style={styles.description}>{perfume.description}</Text>
-					  <Button icon="cart-arrow-down" mode="contained"
-							  onPress={onAddToCart}
-					  >
-						  Add to cart
-					  </Button>
-				  </View>
-			  </ScrollView>
-		  </SafeAreaView>
-			  :
-			 <View>
-				 <Text>
-					 No Results
-				 </Text>
-			 </View>
-	  )
-  );
+	return (
+		<ScrollView style={styles.container}>
+			<Animated.ScrollView
+				style={styles.container}
+				onScroll={handleScroll}
+				scrollEventThrottle={16}
+			>
+				<Carousel
+					ref={carouselRef}
+					data={perfume.gallery}
+					renderItem={renderItem}
+					sliderWidth={width}
+					itemWidth={width}
+					onSnapToItem={index => setActiveSlide(index)}
+					autoplay
+					loop
+				/>
+				<Pagination
+					dotsLength={perfume.gallery.length}
+					activeDotIndex={activeSlide}
+					containerStyle={styles.paginationContainer}
+					dotStyle={styles.paginationDot}
+					inactiveDotOpacity={0.4}
+					inactiveDotScale={0.6}
+				/>
+				<View style={styles.contentContainer}>
+					<Text style={styles.name}>{perfume.name}</Text>
+					<View style={styles.separator} />
+					<Text style={styles.price}>${perfume.price.toFixed(2)}</Text>
+					<Text style={styles.description}>{perfume.description}</Text>
+					<TouchableOpacity onPress={onAddToCart} style={styles.button}>
+						<FontAwesome name="shopping-cart" size={20} color="#fff" />
+						<Text style={styles.buttonText}>Add to Cart</Text>
+					</TouchableOpacity>
+				</View>
+			</Animated.ScrollView>
+		</ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({
-		card: {
-		backgroundColor: 'white',
-		borderRadius: 16,
-		shadowOpacity: 0.2,
-		shadowRadius: 4,
-		shadowColor: 'black',
-		shadowOffset: {
-		height: 0,
-		width: 0,
+	container: {
+		flex: 1,
 	},
-		elevation: 1,
-		marginVertical: 20,
+	carouselImage: {
+		width: '100%',
+		height: 200,
 	},
-		image: {
-		height: 300,
-		width: '100%'
+	paginationContainer: {
+		paddingVertical: 8,
 	},
-		infoContainer: {
+	paginationDot: {
+		width: 8,
+		height: 8,
+		borderRadius: 4,
+		marginHorizontal: 8,
+		backgroundColor: '#007BFF',
+	},
+	contentContainer: {
 		padding: 16,
+		backgroundColor: '#fff',
 	},
-		name: {
-		fontSize: 22,
+	name: {
+		fontSize: 24,
 		fontWeight: 'bold',
 	},
-		price: {
-		fontSize: 16,
-		fontWeight: '600',
-		marginBottom: 8,
+	separator: {
+		borderBottomColor: '#ccc',
+		borderBottomWidth: 1,
+		marginVertical: 16,
 	},
-		description: {
-		fontSize: 16,
-		fontWeight: '400',
-		color: '#787878',
+	price: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		color: '#007BFF',
 		marginBottom: 16,
+	},
+	description: {
+		fontSize: 16,
+		lineHeight: 24,
+	},
+	button: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#007BFF',
+		padding: 10,
+		marginTop: 16,
+		borderRadius: 5,
+	},
+	buttonText: {
+		color: '#fff',
+		marginLeft: 8,
 	},
 });
