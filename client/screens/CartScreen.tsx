@@ -14,11 +14,7 @@ import customAxios from "../axios/axios";
 import Actions from "../StateManagement/Actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useCartManagement from "../StateManagement/CartManagement";
-const CART_ITEMS = [
-	{ id: '1', name: 'Perfume A', price: 50, quantity: 2, thumbnailUrl: 'https://cdn.salla.sa/yrlRO/x1x5qjVc0pAqpPMSvMWjsPbgk7CksGIzLAKl7qqV.jpg'},
-	{ id: '2', name: 'Perfume B', price: 80, quantity: 1, thumbnailUrl: 'https://cdn.salla.sa/yrlRO/x1x5qjVc0pAqpPMSvMWjsPbgk7CksGIzLAKl7qqV.jpg'},
-	{ id: '3', name: 'Perfume C', price: 120, quantity: 3, thumbnailUrl: 'https://cdn.salla.sa/yrlRO/x1x5qjVc0pAqpPMSvMWjsPbgk7CksGIzLAKl7qqV.jpg' },
-];
+
 
 const ShoppingCartScreen = () => {
 	const { state, dispatch } = useCartManagement();

@@ -6,12 +6,11 @@ import {
 	DeviceEventEmitter, FlatList, StyleSheet
 } from 'react-native';
 import customAxios from '../axios/axios';
-import Card from '../components/Card';
+
 import CardPerfume from "../components/CardPerfume";
 import {TabActions} from "@react-navigation/native";
 import {RootDrawerScreenProps, RootTabScreenProps} from "../types";
 import {storeData} from "../StateManagement/CartManagement";
-import {FontAwesome} from "@expo/vector-icons";
 import {Text as TextOwn, Text, View as ViewOwn} from "../components/Themed";
 
 export default function SearchScreen({ route, navigation }: RootTabScreenProps<"SearchScreen">) {

@@ -1,18 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import {
-	ActivityIndicator, DeviceEventEmitter, Dimensions,
-	Platform,
-	ScrollView,
-	StyleSheet
+import {DeviceEventEmitter, Dimensions, StyleSheet
 } from 'react-native';
 import { FlatList } from 'react-native';
 import { Text, View } from '../components/Themed';
 import {RootStackScreenProps, RootTabScreenProps} from "../types";
 import useCartManagement from "../StateManagement/CartManagement";
 import customAxios from "../axios/axios";
-import Actions from "../StateManagement/Actions";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {FontAwesome, FontAwesome5} from "@expo/vector-icons";
 import {useEffect, useState} from "react";
 import {TabActions} from "@react-navigation/native";

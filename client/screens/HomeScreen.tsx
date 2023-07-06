@@ -2,24 +2,17 @@ import * as React from "react";
 import {
 	ActivityIndicator,
 	Dimensions, FlatList, Image, Platform,
-	SafeAreaView,
 	StyleSheet, Text
 } from "react-native";
-import Banner from "../components/Banner";
-import Categories from "../components/Categories";
-import Perfumes from "../components/Perfumes";
 import SerachBar from "../components/SerachBar";
 import {View, ScrollView} from "../components/Themed";
 import { RootTabScreenProps } from "../types";
 import useStateManagement from "../StateManagement/StateManagement";
 import WelcomeText from "../components/WelcomeText";
-import CarouselCards from "../components/CarouselCards";
-import Pressable from "../components/Pressable";
 import {useEffect, useState} from "react";
 import customAxios from "../axios/axios";
 import {primary} from "../constants/Colors";
 import Card from '../components/Card';
-import {FontAwesome} from "@expo/vector-icons";
 import {TabActions} from "@react-navigation/native";
 import FeaturedProductCarousel from "../components/FeaturedProductCarousel";
 const { width } = Dimensions.get('window');

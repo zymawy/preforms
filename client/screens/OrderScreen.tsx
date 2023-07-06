@@ -1,15 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import { FlatList, Modal, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { FlatList, Modal, TouchableOpacity, StyleSheet } from 'react-native';
 import {RootStackScreenProps} from "../types";
 import { Text, View } from '../components/Themed';
 import customAxios from "../axios/axios";
-
-const orders = [
-	// These are dummy orders
-	{ id: '1', date: '2023-07-10', total: '100.00', status: 'Delivered' },
-	{ id: '2', date: '2023-06-22', total: '200.00', status: 'Shipping' },
-	// more orders...
-];
 
 export default function OrderScreen({
 										  navigation,

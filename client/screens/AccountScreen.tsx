@@ -1,11 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
 import {
-	Image,
 	ImageBackground,
-	Platform,
 	StyleSheet,
-	TextInput
 } from 'react-native';
 
 import { Text, View } from '../components/Themed';

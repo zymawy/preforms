@@ -29,6 +29,16 @@ class Sidebar extends Component
                 'icon'  => 'fa fa-list',
                 'url'  => route('perfumes.index'),
             ],
+                (object) [
+                            'title' => 'Brands',
+                            'icon'  => 'fa fa-list',
+                            'url'  => route('perfumes.index'),
+                        ],
+            (object) [
+                        'title' => 'Users',
+                        'icon'  => 'fa fa-list',
+                        'url'  => route('perfumes.index'),
+                    ],
         ];
     }
 

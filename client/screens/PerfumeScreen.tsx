@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import {
 	Text,
 	Image,
-	SafeAreaView,
 	StyleSheet,
 	DeviceEventEmitter,
 	Dimensions, Animated,TouchableOpacity
@@ -12,8 +11,6 @@ import { storeData } from '../StateManagement/CartManagement';
 import {View, ScrollView} from "../components/Themed";
 import {FontAwesome} from "@expo/vector-icons";
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import CardPerfume from "../components/CardPerfume";
-import {TabActions} from "@react-navigation/native"; // install this using npm i react-native-snap-carousel
 
 const { width } = Dimensions.get('window');
 

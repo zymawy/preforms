@@ -3,15 +3,11 @@ import * as React from 'react';
 import {
 	DeviceEventEmitter,
 	Dimensions, FlatList,
-	Platform,
-	ScrollView,
 	StyleSheet
 } from 'react-native';
 
-import EditScreenInfo from '../components/EditScreenInfo';
 import { Text, View } from '../components/Themed';
 import {RootStackScreenProps} from "../types";
-import Perfumes from "../components/Perfumes";
 import CardPerfume from "../components/CardPerfume";
 import {TabActions} from "@react-navigation/native";
 import {useEffect, useState} from "react";
