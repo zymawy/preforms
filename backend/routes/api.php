@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function(){
     Route::post('login', [AuthController::class, 'signIn']);
     Route::post('register', [AuthController::class, 'signUp']);
 
-    Route::group( function () {
+    Route::group([], function () {
         // get user data
         Route::get('user', [AuthController::class, 'user']);
 

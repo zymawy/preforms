@@ -20,6 +20,15 @@ class AuthController extends BaseController
 
     public function signIn(Request $request): JsonResponse
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Error validation', $validator->errors());
+        }
+
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
             $authUser = auth('sanctum')->user();
             $success['token'] =  $authUser->createToken('auth_token')->plainTextToken;
